@@ -15,6 +15,10 @@ from genfine.policy.decision_engine import (
     DecisionEngine,
 )
 
+from genfine.verification.verifier import (
+    OutputVerifier,
+)
+
 
 class PipelineError(RuntimeError):
     """Raised when the GenFINE pipeline cannot complete an instance."""
@@ -29,21 +33,23 @@ class PipelineRunner:
     """
 
     def __init__(
-        self,
-        *,
-        analyzer: Analyzer,
-        decision_engine: DecisionEngine,
-        edit_plan_builder: EditPlanBuilder,
-        rewriter: Rewriter,
+            self,
+            *,
+            analyzer: Analyzer,
+            decision_engine: DecisionEngine,
+            edit_plan_builder: EditPlanBuilder,
+            rewriter: Rewriter,
+            verifier: OutputVerifier | None = None,
     ) -> None:
         self.analyzer = analyzer
         self.decision_engine = decision_engine
         self.edit_plan_builder = edit_plan_builder
         self.rewriter = rewriter
+        self.verifier = verifier
 
     def run(
-        self,
-        instance: DatasetInstance,
+            self,
+            instance: DatasetInstance,
     ) -> RunRecord:
         """Run one dataset instance through the full pipeline."""
 
@@ -69,6 +75,15 @@ class PipelineRunner:
             analysis=analysis,
             edit_plan=edit_plan,
         )
+        verification = None
+
+        if self.verifier is not None:
+            verification = self.verifier.verify(
+                instance=instance,
+                analysis=analysis,
+                edit_plan=edit_plan,
+                output_text=output_text,
+            )
 
         return RunRecord(
             instance_id=instance.instance_id,
@@ -78,6 +93,7 @@ class PipelineRunner:
             predicted_analysis=analysis,
             edit_plan=edit_plan,
             output_text=output_text,
+            verification=verification,
             metadata={
                 "analyzer": self.analyzer.name,
                 "rewriter": self.rewriter.name,
@@ -85,14 +101,17 @@ class PipelineRunner:
                     self.decision_engine.version
                 ),
                 "task_mode": instance.task_mode.value,
+                "verification_enabled": (
+                        self.verifier is not None
+                ),
             },
         )
 
     def run_many(
-        self,
-        instances: Iterable[DatasetInstance],
-        *,
-        continue_on_error: bool = False,
+            self,
+            instances: Iterable[DatasetInstance],
+            *,
+            continue_on_error: bool = False,
     ) -> list[RunRecord]:
         """
         Run multiple instances while preserving input order.

@@ -9,6 +9,8 @@ from genfine.pipeline import (
 )
 from genfine.policy import DecisionEngine
 
+from genfine.verification import OutputVerifier
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
@@ -36,6 +38,7 @@ def build_runner() -> PipelineRunner:
         ),
         edit_plan_builder=EditPlanBuilder(),
         rewriter=GoldRewriter(),
+        verifier=OutputVerifier.default(),
     )
 
 
@@ -185,3 +188,15 @@ def test_continue_on_error_returns_error_record() -> None:
     assert len(records) == 1
     assert records[0].errors
     assert records[0].output_text is None
+
+def test_oracle_pipeline_verification_passes() -> None:
+    instances = load_dataset(SEED_PATH)
+
+    records = build_runner().run_many(
+        instances
+    )
+
+    for record in records:
+        assert record.verification is not None
+        assert record.verification.passed
+        assert record.verification.issues == []
