@@ -164,6 +164,17 @@ class ProtectedFact(GenFineBaseModel):
     source_span_ids: list[str] = Field(default_factory=list)
     must_preserve: bool = True
 
+    # MVP lexical verification.
+    # Every required phrase must appear in the output.
+    required_output_phrases: list[str] = Field(
+        default_factory=list
+    )
+
+    # None of the forbidden phrases may appear in the output.
+    forbidden_output_phrases: list[str] = Field(
+        default_factory=list
+    )
+
     verification_hint: str | None = None
 
 

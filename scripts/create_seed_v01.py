@@ -165,6 +165,7 @@ def build_kinship_keep_instance() -> DatasetInstance:
                     description="person_1 是说话者的姐姐",
                     source_span_ids=["s1"],
                     must_preserve=True,
+                    required_output_phrases=["姐姐"],
                     verification_hint="改写后仍应保留“姐姐”这一亲属关系。",
                 ),
                 ProtectedFact(
@@ -173,6 +174,7 @@ def build_kinship_keep_instance() -> DatasetInstance:
                     description="“她”和“姐姐”指向同一个人",
                     source_span_ids=["s1", "s2"],
                     must_preserve=True,
+                    required_output_phrases=["姐姐", "她"],
                     verification_hint="改写后不能改变两个表达的指称关系。",
                 ),
             ],
@@ -319,6 +321,7 @@ def build_historical_visibility_instance() -> DatasetInstance:
                     description="该人物是本院第一位女性院士",
                     source_span_ids=["s2"],
                     must_preserve=True,
+                    required_output_phrases=["第一位女性院士"],
                     verification_hint=(
                         "改写结果必须保留“第一位女性院士”的历史事实。"
                     ),
@@ -483,6 +486,11 @@ def build_generic_male_instance() -> DatasetInstance:
                     description="每位学生都应提交属于自己的作业",
                     source_span_ids=[],
                     must_preserve=True,
+                    required_output_phrases=[
+                        "每位学生",
+                        "提交",
+                        "作业",
+                    ],
                     verification_hint=(
                         "改写不能改变学生需要提交本人作业的要求。"
                     ),
@@ -596,6 +604,7 @@ def build_rejected_quote_instance() -> DatasetInstance:
                     description="被批评的原始命题是“女人不适合领导”",
                     source_span_ids=["s1"],
                     must_preserve=True,
+                    required_output_phrases=["女人不适合领导"],
                     verification_hint="不得把被批评的引语改成其他命题。",
                 ),
                 ProtectedFact(
@@ -604,6 +613,7 @@ def build_rejected_quote_instance() -> DatasetInstance:
                     description="当前说话者认为该观念是错误的",
                     source_span_ids=["s1"],
                     must_preserve=True,
+                    required_output_phrases=["错误观念"],
                     verification_hint="不得把否定立场改成赞同或中立陈述。",
                 ),
             ],
@@ -702,6 +712,10 @@ def build_preserve_ambiguity_instance() -> DatasetInstance:
                     description="执行手术的人是一名外科医生",
                     source_span_ids=["s1"],
                     must_preserve=True,
+                    required_output_phrases=[
+                        "外科医生",
+                        "手术",
+                    ],
                     verification_hint="不能改变人物的职业角色。",
                 ),
                 ProtectedFact(
@@ -710,6 +724,14 @@ def build_preserve_ambiguity_instance() -> DatasetInstance:
                     description="原文没有说明该外科医生的性别",
                     source_span_ids=["s1"],
                     must_preserve=True,
+                    forbidden_output_phrases=[
+                        "他",
+                        "她",
+                        "男性",
+                        "女性",
+                        "男外科医生",
+                        "女外科医生",
+                    ],
                     verification_hint=(
                         "改写不得新增“他”“她”“男性”或“女性”等信息。"
                     ),
