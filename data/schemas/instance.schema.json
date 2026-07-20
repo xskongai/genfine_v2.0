@@ -1,0 +1,933 @@
+{
+  "$defs": {
+    "Action": {
+      "description": "Fine-grained action applied to a mention or proposition span.",
+      "enum": [
+        "KEEP",
+        "KEEP_WITH_ATTRIBUTION",
+        "NEUTRALIZE",
+        "UNMARK",
+        "GENERALIZE",
+        "SPECIFY_OR_RESTORE",
+        "CORRECT_IDENTITY",
+        "REPLACE_GENERIC_FORM",
+        "STANDARDIZE_REFERENCE",
+        "REFRAME_PROPOSITION",
+        "ADD_SCOPE_OR_QUALIFICATION",
+        "BALANCE_REPRESENTATION",
+        "PRESERVE_AMBIGUITY",
+        "ABSTAIN"
+      ],
+      "title": "Action",
+      "type": "string"
+    },
+    "AnalysisResult": {
+      "additionalProperties": false,
+      "description": "Complete structured analysis of one input instance.",
+      "properties": {
+        "referents": {
+          "items": {
+            "$ref": "#/$defs/Referent"
+          },
+          "title": "Referents",
+          "type": "array"
+        },
+        "spans": {
+          "items": {
+            "$ref": "#/$defs/AnalysisSpan"
+          },
+          "title": "Spans",
+          "type": "array"
+        },
+        "protected_facts": {
+          "items": {
+            "$ref": "#/$defs/ProtectedFact"
+          },
+          "title": "Protected Facts",
+          "type": "array"
+        },
+        "speaker_stance": {
+          "$ref": "#/$defs/SpeakerStance",
+          "default": "NOT_APPLICABLE"
+        },
+        "context_sufficient": {
+          "default": true,
+          "title": "Context Sufficient",
+          "type": "boolean"
+        },
+        "analysis_notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Analysis Notes"
+        }
+      },
+      "title": "AnalysisResult",
+      "type": "object"
+    },
+    "AnalysisSpan": {
+      "additionalProperties": false,
+      "description": "A text span relevant to gender-information analysis.\n\nThis can be a short gender cue such as “她”, or a larger proposition such\nas “女性天生更善于管理” when the complete proposition is the edit target.",
+      "properties": {
+        "span_id": {
+          "minLength": 1,
+          "title": "Span Id",
+          "type": "string"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "exclusiveMinimum": 0,
+          "title": "End",
+          "type": "integer"
+        },
+        "cue_type": {
+          "$ref": "#/$defs/GenderCueType"
+        },
+        "explicitness": {
+          "$ref": "#/$defs/Explicitness"
+        },
+        "gender_dimension": {
+          "$ref": "#/$defs/GenderDimension",
+          "default": "UNKNOWN_DIMENSION"
+        },
+        "gender_value": {
+          "$ref": "#/$defs/GenderValue",
+          "default": "UNKNOWN"
+        },
+        "referent_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Referent Id"
+        },
+        "source": {
+          "$ref": "#/$defs/GenderSource",
+          "default": "UNKNOWN"
+        },
+        "source_reliability": {
+          "$ref": "#/$defs/SourceReliability",
+          "default": "UNKNOWN"
+        },
+        "functions": {
+          "items": {
+            "$ref": "#/$defs/FunctionLabel"
+          },
+          "title": "Functions",
+          "type": "array"
+        },
+        "necessity": {
+          "$ref": "#/$defs/NecessityAnnotation"
+        },
+        "bias": {
+          "$ref": "#/$defs/BiasAnnotation"
+        },
+        "stance": {
+          "$ref": "#/$defs/SpeakerStance",
+          "default": "NOT_APPLICABLE"
+        },
+        "confidence": {
+          "default": 1.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "span_id",
+        "text",
+        "start",
+        "end",
+        "cue_type",
+        "explicitness",
+        "necessity",
+        "bias"
+      ],
+      "title": "AnalysisSpan",
+      "type": "object"
+    },
+    "BiasAnnotation": {
+      "additionalProperties": false,
+      "description": "Bias status and the mechanisms through which it is expressed.",
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/BiasStatus"
+        },
+        "mechanisms": {
+          "items": {
+            "$ref": "#/$defs/BiasMechanism"
+          },
+          "title": "Mechanisms",
+          "type": "array"
+        },
+        "rationale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rationale"
+        },
+        "confidence": {
+          "default": 1.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "BiasAnnotation",
+      "type": "object"
+    },
+    "BiasMechanism": {
+      "description": "Mechanism through which gender bias is expressed.",
+      "enum": [
+        "GENERIC_MALE_DEFAULT",
+        "UNNECESSARY_GENDER_MARKING",
+        "STEREOTYPE_ASSOCIATION",
+        "ESSENTIALIST_GENERALIZATION",
+        "PRESCRIPTIVE_ROLE_NORM",
+        "COMPETENCE_OR_AGENCY_DENIAL",
+        "ASYMMETRY_OR_DOUBLE_STANDARD",
+        "OBJECTIFICATION",
+        "SEXUALIZATION",
+        "DEROGATION_OR_SLUR",
+        "PATERNALISM",
+        "BENEVOLENT_SEXISM",
+        "POSITIVE_STEREOTYPE",
+        "IDENTITY_INVALIDATION",
+        "MISGENDERING",
+        "EXCLUSION",
+        "ERASURE",
+        "STATISTICAL_OVERGENERALIZATION",
+        "UNSUPPORTED_GENDER_INFERENCE",
+        "INTERSECTIONAL_BIAS"
+      ],
+      "title": "BiasMechanism",
+      "type": "string"
+    },
+    "BiasStatus": {
+      "description": "Whether the mention or proposition expresses gender bias.",
+      "enum": [
+        "NONE",
+        "POTENTIAL",
+        "IMPLICIT",
+        "EXPLICIT",
+        "CONTESTED",
+        "INSUFFICIENT_CONTEXT"
+      ],
+      "title": "BiasStatus",
+      "type": "string"
+    },
+    "DatasetMetadata": {
+      "additionalProperties": false,
+      "description": "Dataset provenance and annotation metadata.",
+      "properties": {
+        "source_type": {
+          "default": "constructed",
+          "title": "Source Type",
+          "type": "string"
+        },
+        "source_reference": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Reference"
+        },
+        "scenario_category": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scenario Category"
+        },
+        "context_pair_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Context Pair Id"
+        },
+        "minimal_pair_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Minimal Pair Id"
+        },
+        "annotator_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Annotator Ids",
+          "type": "array"
+        },
+        "annotation_version": {
+          "default": "v0.1",
+          "title": "Annotation Version",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        }
+      },
+      "title": "DatasetMetadata",
+      "type": "object"
+    },
+    "DecisionAnnotation": {
+      "additionalProperties": false,
+      "description": "Gold decision labels stored in the dataset.",
+      "properties": {
+        "instance_action": {
+          "$ref": "#/$defs/InstanceAction"
+        },
+        "edit_scope": {
+          "$ref": "#/$defs/EditScope"
+        },
+        "span_actions": {
+          "items": {
+            "$ref": "#/$defs/SpanActionAnnotation"
+          },
+          "title": "Span Actions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "instance_action",
+        "edit_scope"
+      ],
+      "title": "DecisionAnnotation",
+      "type": "object"
+    },
+    "EditScope": {
+      "description": "Scope at which an intervention is applied.",
+      "enum": [
+        "NONE",
+        "SPAN",
+        "MULTI_SPAN",
+        "SENTENCE",
+        "DOCUMENT"
+      ],
+      "title": "EditScope",
+      "type": "string"
+    },
+    "Explicitness": {
+      "description": "Whether a gender cue is directly expressed in the text.",
+      "enum": [
+        "EXPLICIT",
+        "IMPLICIT",
+        "NONE",
+        "UNDETERMINED"
+      ],
+      "title": "Explicitness",
+      "type": "string"
+    },
+    "FunctionLabel": {
+      "description": "Semantic and pragmatic functions performed by gender information.\n\nA mention may have multiple function labels.",
+      "enum": [
+        "IDENTIFICATION",
+        "DISAMBIGUATION",
+        "COREFERENCE",
+        "KINSHIP_RELATION",
+        "PERSONAL_IDENTITY",
+        "BIOLOGICAL_MEDICAL",
+        "REPRODUCTIVE",
+        "LEGAL_ADMINISTRATIVE",
+        "DEMOGRAPHIC_STATISTICAL",
+        "ELIGIBILITY_OR_ACCESS",
+        "TOPIC_CONTINUITY",
+        "CONTRASTIVE",
+        "COMPARATIVE",
+        "EXPLANATORY",
+        "CAUSAL",
+        "CATEGORY_CONSTRUCTION",
+        "HISTORICAL_SIGNIFICANCE",
+        "REPRESENTATIONAL_VISIBILITY",
+        "UNDERREPRESENTED_IDENTITY",
+        "AFFIRMATIVE_RECOGNITION",
+        "SOCIAL_INEQUALITY_DESCRIPTION",
+        "DIRECT_QUOTATION",
+        "REPORTED_SPEECH",
+        "METALINGUISTIC_MENTION",
+        "BIAS_CRITIQUE",
+        "EDUCATIONAL_EXAMPLE",
+        "NARRATIVE_CHARACTERIZATION",
+        "PERSONA_CONSTRUCTION",
+        "RHETORICAL_EFFECT",
+        "IRONY_OR_SATIRE",
+        "VOICE_PRESERVATION",
+        "GENERIC_REFERENCE",
+        "GROUP_GENERALIZATION",
+        "INCIDENTAL_DESCRIPTION",
+        "UNNECESSARY_MARKING",
+        "UNKNOWN_FUNCTION",
+        "NOT_APPLICABLE"
+      ],
+      "title": "FunctionLabel",
+      "type": "string"
+    },
+    "GenderCueType": {
+      "description": "Surface or inferred type of a gender-related cue.",
+      "enum": [
+        "PRONOUN",
+        "KINSHIP_TERM",
+        "TITLE_ADDRESS",
+        "GENDERED_PERSON_NOUN",
+        "OCCUPATION_MARKER",
+        "IDENTITY_TERM",
+        "BIOLOGICAL_TERM",
+        "REPRODUCTIVE_ROLE",
+        "GENDERED_EVALUATION",
+        "GENERIC_GENDER_FORM",
+        "ORTHOGRAPHIC_MARKER",
+        "STEREOTYPICAL_ATTRIBUTE",
+        "ROLE_ASSOCIATION",
+        "GENDERED_PRESUPPOSITION",
+        "DEFAULT_GENDER_INFERENCE",
+        "COREFERENCE_INFERENCE",
+        "PRAGMATIC_IMPLICATION",
+        "NO_GENDER_CUE",
+        "OTHER"
+      ],
+      "title": "GenderCueType",
+      "type": "string"
+    },
+    "GenderDimension": {
+      "description": "The semantic dimension represented by the gender information.\n\nSex characteristics, gender identity, grammatical gender and perceived\ngender must not be collapsed into a single label.",
+      "enum": [
+        "SEX_CHARACTERISTIC",
+        "GENDER_IDENTITY",
+        "GENDER_EXPRESSION",
+        "SOCIAL_GENDER_ROLE",
+        "GRAMMATICAL_GENDER",
+        "GENDER_REFERENCE",
+        "PERCEIVED_GENDER",
+        "UNKNOWN_DIMENSION",
+        "NOT_APPLICABLE"
+      ],
+      "title": "GenderDimension",
+      "type": "string"
+    },
+    "GenderSource": {
+      "description": "Where the gender information comes from.",
+      "enum": [
+        "SELF_IDENTIFIED",
+        "EXPLICITLY_STATED",
+        "DOCUMENTED_RECORD",
+        "AUTHOR_ASSIGNED",
+        "QUOTED_SOURCE",
+        "CONTEXTUALLY_INFERRED",
+        "STEREOTYPE_INFERRED",
+        "MODEL_INFERRED",
+        "UNKNOWN"
+      ],
+      "title": "GenderSource",
+      "type": "string"
+    },
+    "GenderValue": {
+      "description": "Gender value explicitly stated or grounded in context.",
+      "enum": [
+        "FEMALE",
+        "MALE",
+        "NON_BINARY",
+        "MIXED_GROUP",
+        "MULTIPLE_GENDERS",
+        "UNKNOWN",
+        "UNSPECIFIED",
+        "NOT_APPLICABLE"
+      ],
+      "title": "GenderValue",
+      "type": "string"
+    },
+    "InstanceAction": {
+      "description": "Sentence- or instance-level action aggregated from span-level actions.",
+      "enum": [
+        "KEEP",
+        "EDIT",
+        "SPAN_LEVEL_EDIT",
+        "ABSTAIN"
+      ],
+      "title": "InstanceAction",
+      "type": "string"
+    },
+    "Necessity": {
+      "description": "How necessary the gender information is in the current context.",
+      "enum": [
+        "ESSENTIAL",
+        "RELEVANT",
+        "OPTIONAL",
+        "INCIDENTAL",
+        "HARMFUL_OR_MISLEADING",
+        "UNDETERMINED",
+        "NOT_APPLICABLE"
+      ],
+      "title": "Necessity",
+      "type": "string"
+    },
+    "NecessityAnnotation": {
+      "additionalProperties": false,
+      "description": "Context-sensitive necessity annotation.",
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/Necessity"
+        },
+        "reasons": {
+          "items": {
+            "$ref": "#/$defs/NecessityReason"
+          },
+          "title": "Reasons",
+          "type": "array"
+        },
+        "rationale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rationale"
+        },
+        "confidence": {
+          "default": 1.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "NecessityAnnotation",
+      "type": "object"
+    },
+    "NecessityReason": {
+      "description": "Why gender information should be preserved, changed or removed.",
+      "enum": [
+        "TRUTH_CONDITIONAL",
+        "REFERENT_IDENTIFICATION",
+        "COREFERENCE_RESOLUTION",
+        "KINSHIP_RELATION",
+        "DOMAIN_REQUIREMENT",
+        "TASK_REQUIREMENT",
+        "IDENTITY_RESPECT",
+        "HISTORICAL_SIGNIFICANCE",
+        "REPRESENTATIONAL_RELEVANCE",
+        "DISCOURSE_COHERENCE",
+        "QUOTATION_FIDELITY",
+        "SPEAKER_VOICE",
+        "PRIVACY_PROTECTION",
+        "NO_COMMUNICATIVE_RELEVANCE",
+        "INSUFFICIENT_CONTEXT"
+      ],
+      "title": "NecessityReason",
+      "type": "string"
+    },
+    "ProtectedFact": {
+      "additionalProperties": false,
+      "description": "A fact or semantic property that a rewrite must preserve.",
+      "properties": {
+        "fact_id": {
+          "minLength": 1,
+          "title": "Fact Id",
+          "type": "string"
+        },
+        "fact_type": {
+          "$ref": "#/$defs/ProtectedFactType"
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "source_span_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Span Ids",
+          "type": "array"
+        },
+        "must_preserve": {
+          "default": true,
+          "title": "Must Preserve",
+          "type": "boolean"
+        },
+        "verification_hint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Verification Hint"
+        }
+      },
+      "required": [
+        "fact_id",
+        "fact_type",
+        "description"
+      ],
+      "title": "ProtectedFact",
+      "type": "object"
+    },
+    "ProtectedFactType": {
+      "description": "Information that a rewrite is not allowed to alter.",
+      "enum": [
+        "ENTITY_IDENTITY",
+        "SELF_IDENTIFIED_GENDER",
+        "KINSHIP_RELATION",
+        "MEDICAL_FACT",
+        "DEMOGRAPHIC_VARIABLE",
+        "HISTORICAL_STATUS",
+        "NAMED_ENTITY",
+        "NUMBER_AND_QUANTITY",
+        "TIME_AND_LOCATION",
+        "NEGATION",
+        "MODALITY",
+        "CAUSALITY",
+        "SPEAKER_STANCE",
+        "ATTRIBUTION",
+        "QUOTATION_CONTENT",
+        "COREFERENCE",
+        "OTHER"
+      ],
+      "title": "ProtectedFactType",
+      "type": "string"
+    },
+    "Referent": {
+      "additionalProperties": false,
+      "description": "An entity or group referred to by one or more analysis spans.",
+      "properties": {
+        "referent_id": {
+          "minLength": 1,
+          "title": "Referent Id",
+          "type": "string"
+        },
+        "referent_type": {
+          "$ref": "#/$defs/ReferentType"
+        },
+        "number": {
+          "default": "UNKNOWN",
+          "title": "Number",
+          "type": "string"
+        },
+        "specificity": {
+          "default": "UNKNOWN",
+          "title": "Specificity",
+          "type": "string"
+        },
+        "identity_relevance": {
+          "default": false,
+          "title": "Identity Relevance",
+          "type": "boolean"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        }
+      },
+      "required": [
+        "referent_id",
+        "referent_type"
+      ],
+      "title": "Referent",
+      "type": "object"
+    },
+    "ReferentType": {
+      "description": "The kind of entity to which a gender cue refers.",
+      "enum": [
+        "SPECIFIC_PERSON",
+        "SPECIFIC_GROUP",
+        "GENERIC_PERSON",
+        "GENERIC_GROUP",
+        "HYPOTHETICAL_PERSON",
+        "FICTIONAL_PERSON",
+        "HISTORICAL_PERSON",
+        "UNKNOWN_REFERENT",
+        "NO_REFERENT"
+      ],
+      "title": "ReferentType",
+      "type": "string"
+    },
+    "SourceReliability": {
+      "description": "Reliability of the gender-information source.",
+      "enum": [
+        "CONFIRMED",
+        "SUPPORTED",
+        "INFERRED",
+        "SPECULATIVE",
+        "CONTRADICTORY",
+        "UNKNOWN"
+      ],
+      "title": "SourceReliability",
+      "type": "string"
+    },
+    "SpanActionAnnotation": {
+      "additionalProperties": false,
+      "description": "Gold or predicted action for one analysis span.",
+      "properties": {
+        "span_id": {
+          "minLength": 1,
+          "title": "Span Id",
+          "type": "string"
+        },
+        "action": {
+          "$ref": "#/$defs/Action"
+        },
+        "reason_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason Code"
+        },
+        "rationale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rationale"
+        }
+      },
+      "required": [
+        "span_id",
+        "action"
+      ],
+      "title": "SpanActionAnnotation",
+      "type": "object"
+    },
+    "SpeakerStance": {
+      "description": "The speaker or author's stance toward a biased proposition.",
+      "enum": [
+        "ENDORSE",
+        "REPORT",
+        "QUOTE",
+        "REJECT",
+        "QUESTION",
+        "SATIRIZE",
+        "DISTANCE",
+        "NEUTRAL_REPORT",
+        "UNCLEAR",
+        "NOT_APPLICABLE"
+      ],
+      "title": "SpeakerStance",
+      "type": "string"
+    },
+    "TaskMode": {
+      "description": "The task being performed on the input text.",
+      "enum": [
+        "INCLUSIVE_REWRITING",
+        "SOURCE_FAITHFUL_SUMMARIZATION",
+        "TRANSLATION",
+        "ANONYMIZATION",
+        "BIAS_EXPLANATION",
+        "ARCHIVAL_PRESERVATION"
+      ],
+      "title": "TaskMode",
+      "type": "string"
+    },
+    "TextContext": {
+      "additionalProperties": false,
+      "description": "Input text together with its discourse and task context.",
+      "properties": {
+        "preceding_context": {
+          "default": "",
+          "title": "Preceding Context",
+          "type": "string"
+        },
+        "target_text": {
+          "minLength": 1,
+          "title": "Target Text",
+          "type": "string"
+        },
+        "following_context": {
+          "default": "",
+          "title": "Following Context",
+          "type": "string"
+        },
+        "genre": {
+          "default": "unspecified",
+          "title": "Genre",
+          "type": "string"
+        },
+        "speaker": {
+          "default": "unspecified",
+          "title": "Speaker",
+          "type": "string"
+        },
+        "audience": {
+          "default": "unspecified",
+          "title": "Audience",
+          "type": "string"
+        },
+        "communicative_goal": {
+          "default": "unspecified",
+          "title": "Communicative Goal",
+          "type": "string"
+        },
+        "temporal_context": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Temporal Context"
+        },
+        "cultural_context": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cultural Context"
+        }
+      },
+      "required": [
+        "target_text"
+      ],
+      "title": "TextContext",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One complete labeled GenFINE dataset instance.",
+  "properties": {
+    "instance_id": {
+      "minLength": 1,
+      "title": "Instance Id",
+      "type": "string"
+    },
+    "language": {
+      "default": "zh",
+      "minLength": 2,
+      "title": "Language",
+      "type": "string"
+    },
+    "task_mode": {
+      "$ref": "#/$defs/TaskMode",
+      "default": "INCLUSIVE_REWRITING"
+    },
+    "context": {
+      "$ref": "#/$defs/TextContext"
+    },
+    "gold_analysis": {
+      "$ref": "#/$defs/AnalysisResult"
+    },
+    "gold_decision": {
+      "$ref": "#/$defs/DecisionAnnotation"
+    },
+    "gold_output": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Gold Output"
+    },
+    "metadata": {
+      "$ref": "#/$defs/DatasetMetadata"
+    }
+  },
+  "required": [
+    "instance_id",
+    "context",
+    "gold_analysis",
+    "gold_decision"
+  ],
+  "title": "DatasetInstance",
+  "type": "object"
+}
