@@ -1,0 +1,259 @@
+version: "0.1"
+
+rules:
+  - id: abstain_insufficient_context
+    priority: 100
+    description: 上下文不足或关键判断不确定时不强制编辑
+    when:
+      any:
+        - path: analysis.context_sufficient
+          op: is_false
+        - path: span.necessity.status
+          op: eq
+          value: UNDETERMINED
+        - path: span.bias.status
+          op: eq
+          value: INSUFFICIENT_CONTEXT
+        - path: span.stance
+          op: eq
+          value: UNCLEAR
+    action: ABSTAIN
+    reason_code: INSUFFICIENT_CONTEXT
+    constraints:
+      - Do not force a rewrite when the intended meaning or stance is unclear.
+      - Preserve the original text until sufficient context is available.
+
+  - id: preserve_rejected_biased_quotation
+    priority: 95
+    description: 偏见命题作为被否定、转述或批评对象时保留
+    when:
+      all:
+        - path: span.functions
+          op: contains
+          value: DIRECT_QUOTATION
+        - path: span.bias.status
+          op: in
+          value:
+            - EXPLICIT
+            - IMPLICIT
+            - POTENTIAL
+        - path: span.stance
+          op: in
+          value:
+            - REJECT
+            - DISTANCE
+            - REPORT
+            - QUOTE
+    action: KEEP_WITH_ATTRIBUTION
+    reason_code: REJECTED_BIASED_QUOTATION
+    constraints:
+      - Preserve the quoted proposition.
+      - Preserve attribution and the current speaker's stance.
+      - Do not transform rejection into endorsement.
+
+  - id: preserve_no_gender_information
+    priority: 90
+    description: 原文未说明性别时不得根据职业或刻板印象补全
+    when:
+      all:
+        - path: span.cue_type
+          op: eq
+          value: NO_GENDER_CUE
+        - path: span.explicitness
+          op: eq
+          value: NONE
+        - path: span.gender_value
+          op: in
+          value:
+            - UNSPECIFIED
+            - UNKNOWN
+        - path: span.source
+          op: in
+          value:
+            - UNKNOWN
+            - MODEL_INFERRED
+            - STEREOTYPE_INFERRED
+    action: PRESERVE_AMBIGUITY
+    reason_code: NO_GROUNDED_GENDER_INFORMATION
+    constraints:
+      - Do not introduce pronouns or gender labels unsupported by the source.
+      - Preserve the source text's unspecified-gender status.
+
+  - id: replace_generic_male
+    priority: 85
+    description: 泛指所有人时替换男性默认形式
+    when:
+      all:
+        - path: span.functions
+          op: contains
+          value: GENERIC_REFERENCE
+        - path: span.bias.mechanisms
+          op: contains
+          value: GENERIC_MALE_DEFAULT
+    action: REPLACE_GENERIC_FORM
+    reason_code: GENERIC_MALE_DEFAULT
+    constraints:
+      - Replace only the generic masculine form.
+      - Preserve the generic referent, obligation and ownership relation.
+      - Do not narrow or expand the intended population.
+
+  - id: qualify_statistical_overgeneralization
+    priority: 80
+    description: 医学或统计陈述过度概括时增加范围限定
+    when:
+      all:
+        - path: span.functions
+          op: intersects
+          value:
+            - DEMOGRAPHIC_STATISTICAL
+            - BIOLOGICAL_MEDICAL
+            - COMPARATIVE
+        - path: span.bias.mechanisms
+          op: contains
+          value: STATISTICAL_OVERGENERALIZATION
+    action: ADD_SCOPE_OR_QUALIFICATION
+    reason_code: OVERGENERALIZED_STATISTICAL_CLAIM
+    constraints:
+      - Preserve the reported observation.
+      - Add population, sample or uncertainty scope where supported.
+      - Do not convert association into causation.
+
+  - id: reframe_endorsed_stereotype
+    priority: 75
+    description: 被作者支持的群体刻板概括需要重构
+    when:
+      all:
+        - path: span.bias.status
+          op: in
+          value:
+            - EXPLICIT
+            - IMPLICIT
+        - path: span.stance
+          op: eq
+          value: ENDORSE
+        - path: span.bias.mechanisms
+          op: intersects
+          value:
+            - ESSENTIALIST_GENERALIZATION
+            - PRESCRIPTIVE_ROLE_NORM
+            - COMPETENCE_OR_AGENCY_DENIAL
+            - POSITIVE_STEREOTYPE
+            - BENEVOLENT_SEXISM
+    action: REFRAME_PROPOSITION
+    reason_code: ENDORSED_GENDER_STEREOTYPE
+    constraints:
+      - Remove the gender-based generalization.
+      - Preserve surrounding non-biased facts.
+      - Attribute ability, behavior or suitability to relevant individual factors.
+
+  - id: unmark_incidental_gender
+    priority: 70
+    description: 性别与当前交际目的无关且被不必要突出时去标记
+    when:
+      all:
+        - path: span.necessity.status
+          op: eq
+          value: INCIDENTAL
+        - path: span.bias.mechanisms
+          op: contains
+          value: UNNECESSARY_GENDER_MARKING
+    action: UNMARK
+    reason_code: INCIDENTAL_GENDER_MARKING
+    constraints:
+      - Remove only the unnecessary gender marker.
+      - Preserve the person's occupation, role and identity.
+      - Do not remove other relevant descriptive information.
+
+  - id: keep_historical_representational_information
+    priority: 65
+    description: 历史突破和代表性信息应保留
+    when:
+      all:
+        - path: span.functions
+          op: intersects
+          value:
+            - HISTORICAL_SIGNIFICANCE
+            - REPRESENTATIONAL_VISIBILITY
+            - UNDERREPRESENTED_IDENTITY
+            - AFFIRMATIVE_RECOGNITION
+        - path: span.necessity.status
+          op: in
+          value:
+            - ESSENTIAL
+            - RELEVANT
+        - path: span.bias.status
+          op: eq
+          value: NONE
+    action: KEEP
+    reason_code: HISTORICAL_GENDER_INFORMATION
+    constraints:
+      - Preserve the historical or representational gender information.
+      - Do not neutralize information whose removal would erase significance.
+
+  - id: keep_essential_kinship_information
+    priority: 60
+    description: 真实具体的亲属关系属于必要信息
+    when:
+      all:
+        - path: span.functions
+          op: contains
+          value: KINSHIP_RELATION
+        - path: span.necessity.status
+          op: eq
+          value: ESSENTIAL
+        - path: span.bias.status
+          op: eq
+          value: NONE
+    action: KEEP
+    reason_code: ESSENTIAL_KINSHIP_INFORMATION
+    constraints:
+      - Preserve the specific kinship relation.
+      - Do not replace the relation with a less specific neutral expression.
+
+  - id: keep_valid_specific_coreference
+    priority: 55
+    description: 与明确具体人物一致的指代信息应保留
+    when:
+      all:
+        - path: span.functions
+          op: contains
+          value: COREFERENCE
+        - path: span.necessity.status
+          op: in
+          value:
+            - ESSENTIAL
+            - RELEVANT
+        - path: span.bias.status
+          op: eq
+          value: NONE
+    action: KEEP
+    reason_code: VALID_SPECIFIC_COREFERENCE
+    constraints:
+      - Preserve the reference to the same specific person.
+      - Do not break the coreference chain.
+
+  - id: keep_essential_nonbiased_information
+    priority: 50
+    description: 其他必要且无偏见的性别信息默认保留
+    when:
+      all:
+        - path: span.necessity.status
+          op: eq
+          value: ESSENTIAL
+        - path: span.bias.status
+          op: eq
+          value: NONE
+    action: KEEP
+    reason_code: ESSENTIAL_NONBIASED_INFORMATION
+    constraints:
+      - Preserve the essential information represented by this span.
+
+  - id: default_keep
+    priority: 0
+    description: 没有明确干预依据时保持原文
+    when:
+      always: true
+    action: KEEP
+    reason_code: DEFAULT_NO_INTERVENTION
+    constraints:
+      - Do not edit without a supported intervention reason.
