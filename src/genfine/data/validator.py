@@ -1,32 +1,14 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Author: Kong Xiaoshuang
-Date: 7/20/26
-Description: validator
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Literal
 
 from genfine.data.loader import LoadedInstance
-from genfine.domain.enums import (
-    Action,
-    EditScope,
-    InstanceAction,
-)
+from genfine.domain.enums import EditScope, InstanceAction
+from genfine.policy.action_aggregator import infer_instance_action
 
 
 Severity = Literal["ERROR", "WARNING"]
-
-
-KEEP_LIKE_ACTIONS = {
-    Action.KEEP,
-    Action.KEEP_WITH_ATTRIBUTION,
-    Action.PRESERVE_AMBIGUITY,
-}
 
 
 @dataclass(frozen=True)
@@ -77,7 +59,7 @@ class DatasetValidator:
         records: list[LoadedInstance],
     ) -> DatasetValidationReport:
         report = DatasetValidationReport(
-            instance_count=len(records)
+            instance_count=len(records),
         )
 
         self._validate_unique_instance_ids(
@@ -383,45 +365,3 @@ class DatasetValidator:
                 line_number=record.line_number,
             )
         )
-
-
-def infer_instance_action(
-    actions: list[Action],
-) -> InstanceAction:
-    """
-    Aggregate span-level actions into an instance-level action.
-
-    KEEP_WITH_ATTRIBUTION and PRESERVE_AMBIGUITY do not modify the surface
-    text, so they are treated as KEEP-like actions.
-    """
-
-    if not actions:
-        return InstanceAction.KEEP
-
-    if Action.ABSTAIN in actions:
-        return InstanceAction.ABSTAIN
-
-    keep_actions = [
-        action
-        for action in actions
-        if action in KEEP_LIKE_ACTIONS
-    ]
-
-    edit_actions = [
-        action
-        for action in actions
-        if action not in KEEP_LIKE_ACTIONS
-    ]
-
-    if not edit_actions:
-        return InstanceAction.KEEP
-
-    unique_edit_actions = set(edit_actions)
-
-    if keep_actions:
-        return InstanceAction.SPAN_LEVEL_EDIT
-
-    if len(unique_edit_actions) > 1:
-        return InstanceAction.SPAN_LEVEL_EDIT
-
-    return InstanceAction.EDIT

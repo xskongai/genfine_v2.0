@@ -1,5 +1,7 @@
 pydantic<3.0,>=2.7
 PyYAML<7.0,>=6.0
+openai>=1.0
+python-dotenv<2.0,>=1.0
 
 [dev]
 pytest<9.0,>=8.0
