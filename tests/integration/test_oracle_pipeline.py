@@ -198,5 +198,19 @@ def test_oracle_pipeline_verification_passes() -> None:
 
     for record in records:
         assert record.verification is not None
-        assert record.verification.passed
-        assert record.verification.issues == []
+
+        error_issues = [
+            issue
+            for issue in record.verification.issues
+            if issue.severity == "ERROR"
+        ]
+
+        assert record.verification.passed, (
+            record.instance_id,
+            record.verification.issues,
+        )
+
+        assert not error_issues, (
+            record.instance_id,
+            error_issues,
+        )

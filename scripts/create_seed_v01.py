@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Author: Kong Xiaoshuang
-Date: 7/20/26
-Description: create_seed_v01
-"""
 
 from __future__ import annotations
 
