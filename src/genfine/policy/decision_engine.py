@@ -217,8 +217,14 @@ class DecisionEngine:
 
         if action == Action.UNMARK:
             return [
-                f"Remove only the unnecessary gender marking "
-                f"within {span.text!r}."
+                (
+                    f"Remove only the unnecessary gender marker "
+                    f"{span.text!r}."
+                ),
+                (
+                    "Do not delete the adjacent occupation, role, title, "
+                    "person name or surrounding factual content."
+                ),
             ]
 
         if action == Action.REFRAME_PROPOSITION:
