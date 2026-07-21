@@ -1,0 +1,66 @@
+{
+  "dataset_instance_count": 15,
+  "selected_instance_count": 15,
+  "successful_instance_count": 15,
+  "failed_instance_count": 0,
+  "evaluated_output_count": 14,
+  "no_output_count": 1,
+  "changed_output_count": 5,
+  "total_claim_count": 17,
+  "factual_support_coverage": {
+    "value": 1.0,
+    "numerator": 15,
+    "denominator": 15
+  },
+  "semantic_evaluation_coverage": {
+    "value": 0.9333333333333333,
+    "numerator": 14,
+    "denominator": 15
+  },
+  "unsupported_factual_insertion_rate": {
+    "value": 0.07142857142857142,
+    "numerator": 1,
+    "denominator": 14
+  },
+  "unsupported_factual_claim_rate": {
+    "value": 0.11764705882352941,
+    "numerator": 2,
+    "denominator": 17
+  },
+  "uncertain_claim_rate": {
+    "value": 0.0,
+    "numerator": 0,
+    "denominator": 17
+  },
+  "judge_failure_rate": {
+    "value": 0.0,
+    "numerator": 0,
+    "denominator": 15
+  },
+  "claim_label_counts": {
+    "LICENSED_REFRAMING": 2,
+    "NON_FACTUAL_PARAPHRASE": 1,
+    "SOURCE_SUPPORTED": 12,
+    "UNSUPPORTED_FACTUAL_INSERTION": 2
+  },
+  "plan_action_counts": {
+    "ABSTAIN": 1,
+    "ADD_SCOPE_OR_QUALIFICATION": 1,
+    "KEEP": 9,
+    "KEEP_WITH_ATTRIBUTION": 1,
+    "PRESERVE_AMBIGUITY": 1,
+    "REFRAME_PROPOSITION": 3,
+    "REPLACE_GENERIC_FORM": 1
+  },
+  "unsupported_instance_ids": [
+    "zh_seed_0013"
+  ],
+  "uncertain_instance_ids": [],
+  "failed_instance_ids": [],
+  "metadata": {
+    "judge": "llm-factual-support/gpt-4o",
+    "prompt_version": "0.1",
+    "source_run_file": "runs/llm_gpt_rewriter_v0.2.jsonl",
+    "dataset_file": "data/seed/seed_v0.2.jsonl"
+  }
+}

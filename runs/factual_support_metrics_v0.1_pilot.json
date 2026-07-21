@@ -1,0 +1,57 @@
+{
+  "dataset_instance_count": 15,
+  "selected_instance_count": 3,
+  "successful_instance_count": 2,
+  "failed_instance_count": 1,
+  "evaluated_output_count": 2,
+  "no_output_count": 0,
+  "changed_output_count": 0,
+  "total_claim_count": 2,
+  "factual_support_coverage": {
+    "value": 0.6666666666666666,
+    "numerator": 2,
+    "denominator": 3
+  },
+  "semantic_evaluation_coverage": {
+    "value": 0.6666666666666666,
+    "numerator": 2,
+    "denominator": 3
+  },
+  "unsupported_factual_insertion_rate": {
+    "value": 0.0,
+    "numerator": 0,
+    "denominator": 2
+  },
+  "unsupported_factual_claim_rate": {
+    "value": 0.0,
+    "numerator": 0,
+    "denominator": 2
+  },
+  "uncertain_claim_rate": {
+    "value": 0.0,
+    "numerator": 0,
+    "denominator": 2
+  },
+  "judge_failure_rate": {
+    "value": 0.3333333333333333,
+    "numerator": 1,
+    "denominator": 3
+  },
+  "claim_label_counts": {
+    "SOURCE_SUPPORTED": 2
+  },
+  "plan_action_counts": {
+    "KEEP": 2
+  },
+  "unsupported_instance_ids": [],
+  "uncertain_instance_ids": [],
+  "failed_instance_ids": [
+    "zh_seed_0003"
+  ],
+  "metadata": {
+    "judge": "llm-factual-support/gpt-4o",
+    "prompt_version": "0.1",
+    "source_run_file": "runs/llm_gpt_rewriter_v0.2.jsonl",
+    "dataset_file": "data/seed/seed_v0.2.jsonl"
+  }
+}
