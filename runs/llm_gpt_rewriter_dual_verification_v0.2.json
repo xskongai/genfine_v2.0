@@ -1,0 +1,398 @@
+{
+  "dataset_instance_count": 15,
+  "evaluated_instance_count": 15,
+  "predicted_plan_verification_coverage": {
+    "numerator": 15,
+    "denominator": 15,
+    "value": 1.0
+  },
+  "predicted_plan_verification_pass_rate": {
+    "numerator": 15,
+    "denominator": 15,
+    "value": 1.0
+  },
+  "gold_plan_verification_pass_rate": {
+    "numerator": 11,
+    "denominator": 15,
+    "value": 0.7333333333333333
+  },
+  "upstream_plan_error_rate": {
+    "numerator": 4,
+    "denominator": 15,
+    "value": 0.26666666666666666
+  },
+  "rewrite_execution_error_rate": {
+    "numerator": 0,
+    "denominator": 15,
+    "value": 0.0
+  },
+  "gold_compliant_despite_plan_mismatch_rate": {
+    "numerator": 3,
+    "denominator": 15,
+    "value": 0.2
+  },
+  "records": [
+    {
+      "instance_id": "zh_seed_0001",
+      "predicted_plan_matches_gold": true,
+      "predicted_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "gold_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "category": "PASS"
+    },
+    {
+      "instance_id": "zh_seed_0002",
+      "predicted_plan_matches_gold": true,
+      "predicted_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "gold_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "category": "PASS"
+    },
+    {
+      "instance_id": "zh_seed_0003",
+      "predicted_plan_matches_gold": true,
+      "predicted_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "gold_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "category": "PASS"
+    },
+    {
+      "instance_id": "zh_seed_0004",
+      "predicted_plan_matches_gold": true,
+      "predicted_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "gold_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "category": "PASS"
+    },
+    {
+      "instance_id": "zh_seed_0005",
+      "predicted_plan_matches_gold": true,
+      "predicted_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "gold_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "category": "PASS"
+    },
+    {
+      "instance_id": "zh_seed_0006",
+      "predicted_plan_matches_gold": false,
+      "predicted_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "gold_plan_verification": {
+        "passed": false,
+        "protected_facts_preserved": true,
+        "action_compliant": false,
+        "unsupported_gender_inserted": false,
+        "issues": [
+          {
+            "checker": "action_compliance",
+            "code": "EDIT_NOT_APPLIED",
+            "message": "The edit plan requires a change, but the output is identical to the input.",
+            "severity": "ERROR",
+            "span_text": null
+          },
+          {
+            "checker": "action_compliance",
+            "code": "EDIT_SPAN_REMAINS",
+            "message": "Span '女' should have been removed or replaced but remains in output.",
+            "severity": "ERROR",
+            "span_text": "女"
+          }
+        ]
+      },
+      "category": "UPSTREAM_PLAN_ERROR"
+    },
+    {
+      "instance_id": "zh_seed_0007",
+      "predicted_plan_matches_gold": true,
+      "predicted_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "gold_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "category": "PASS"
+    },
+    {
+      "instance_id": "zh_seed_0008",
+      "predicted_plan_matches_gold": false,
+      "predicted_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "gold_plan_verification": {
+        "passed": false,
+        "protected_facts_preserved": false,
+        "action_compliant": false,
+        "unsupported_gender_inserted": false,
+        "issues": [
+          {
+            "checker": "action_compliance",
+            "code": "EDIT_NOT_APPLIED",
+            "message": "The edit plan requires a change, but the output is identical to the input.",
+            "severity": "ERROR",
+            "span_text": null
+          },
+          {
+            "checker": "action_compliance",
+            "code": "EDIT_SPAN_REMAINS",
+            "message": "Span '女性天生不适合担任领导职务' should have been removed or replaced but remains in output.",
+            "severity": "ERROR",
+            "span_text": "女性天生不适合担任领导职务"
+          },
+          {
+            "checker": "protected_fact",
+            "code": "FORBIDDEN_FACT_PHRASE_PRESENT",
+            "message": "Protected fact 'f1' forbids phrase '女性天生不适合', but it appears in output.",
+            "severity": "ERROR",
+            "span_text": "女性天生不适合"
+          }
+        ]
+      },
+      "category": "UPSTREAM_PLAN_ERROR"
+    },
+    {
+      "instance_id": "zh_seed_0009",
+      "predicted_plan_matches_gold": true,
+      "predicted_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": [
+          {
+            "checker": "protected_fact",
+            "code": "PROTECTED_FACT_NOT_MACHINE_CHECKABLE",
+            "message": "Protected fact 'f1' has no executable verification phrases.",
+            "severity": "WARNING",
+            "span_text": null
+          }
+        ]
+      },
+      "gold_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "category": "PASS"
+    },
+    {
+      "instance_id": "zh_seed_0010",
+      "predicted_plan_matches_gold": true,
+      "predicted_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": [
+          {
+            "checker": "protected_fact",
+            "code": "PROTECTED_FACT_NOT_MACHINE_CHECKABLE",
+            "message": "Protected fact 'fact_1' has no executable verification phrases.",
+            "severity": "WARNING",
+            "span_text": null
+          }
+        ]
+      },
+      "gold_plan_verification": {
+        "passed": false,
+        "protected_facts_preserved": false,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": [
+          {
+            "checker": "protected_fact",
+            "code": "PROTECTED_PHRASE_MISSING",
+            "message": "Protected fact 'f1' requires phrase '单中心研究', but it is missing from output.",
+            "severity": "ERROR",
+            "span_text": "单中心研究"
+          }
+        ]
+      },
+      "category": "UPSTREAM_PLAN_ERROR"
+    },
+    {
+      "instance_id": "zh_seed_0011",
+      "predicted_plan_matches_gold": true,
+      "predicted_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "gold_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "category": "PASS"
+    },
+    {
+      "instance_id": "zh_seed_0012",
+      "predicted_plan_matches_gold": false,
+      "predicted_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "gold_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "category": "GOLD_COMPLIANT_DESPITE_PLAN_MISMATCH"
+    },
+    {
+      "instance_id": "zh_seed_0013",
+      "predicted_plan_matches_gold": true,
+      "predicted_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "gold_plan_verification": {
+        "passed": false,
+        "protected_facts_preserved": false,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": [
+          {
+            "checker": "protected_fact",
+            "code": "PROTECTED_PHRASE_MISSING",
+            "message": "Protected fact 'f2' requires phrase '管理', but it is missing from output.",
+            "severity": "ERROR",
+            "span_text": "管理"
+          }
+        ]
+      },
+      "category": "UPSTREAM_PLAN_ERROR"
+    },
+    {
+      "instance_id": "zh_seed_0014",
+      "predicted_plan_matches_gold": false,
+      "predicted_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": [
+          {
+            "checker": "protected_fact",
+            "code": "PROTECTED_FACT_NOT_MACHINE_CHECKABLE",
+            "message": "Protected fact 'f1' has no executable verification phrases.",
+            "severity": "WARNING",
+            "span_text": null
+          }
+        ]
+      },
+      "gold_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "category": "GOLD_COMPLIANT_DESPITE_PLAN_MISMATCH"
+    },
+    {
+      "instance_id": "zh_seed_0015",
+      "predicted_plan_matches_gold": false,
+      "predicted_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "gold_plan_verification": {
+        "passed": true,
+        "protected_facts_preserved": true,
+        "action_compliant": true,
+        "unsupported_gender_inserted": false,
+        "issues": []
+      },
+      "category": "GOLD_COMPLIANT_DESPITE_PLAN_MISMATCH"
+    }
+  ]
+}

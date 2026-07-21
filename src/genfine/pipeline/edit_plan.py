@@ -80,6 +80,69 @@ class EditPlanBuilder:
             global_constraints=global_constraints,
         )
 
+    def build_gold(
+        self,
+        *,
+        instance: DatasetInstance,
+    ) -> EditPlan:
+        """Build an executable plan from the instance gold annotations.
+
+        Gold annotations use ``SpanActionAnnotation`` while the executable
+        pipeline uses ``SpanDecision``. This method performs only that
+        structural conversion, then reuses the normal plan builder so gold
+        and predicted plans are checked by the same aggregation logic.
+        """
+        decisions = [
+            SpanDecision(
+                span_id=annotation.span_id,
+                action=annotation.action,
+                rule_id="gold_annotation",
+                reason_code=(
+                    annotation.reason_code
+                    or "GOLD_ANNOTATION"
+                ),
+                priority=0,
+                confidence=1.0,
+                constraints=(
+                    [annotation.rationale]
+                    if annotation.rationale
+                    else []
+                ),
+            )
+            for annotation
+            in instance.gold_decision.span_actions
+        ]
+
+        plan = self.build(
+            instance=instance,
+            analysis=instance.gold_analysis,
+            decisions=decisions,
+        )
+
+        gold_decision = instance.gold_decision
+
+        if (
+            plan.instance_action
+            != gold_decision.instance_action
+        ):
+            raise EditPlanError(
+                "Gold span actions aggregate to "
+                f"{plan.instance_action.value}, but the dataset "
+                "declares "
+                f"{gold_decision.instance_action.value} for "
+                f"{instance.instance_id!r}."
+            )
+
+        if plan.edit_scope != gold_decision.edit_scope:
+            raise EditPlanError(
+                "Gold span actions imply edit_scope="
+                f"{plan.edit_scope.value}, but the dataset declares "
+                f"{gold_decision.edit_scope.value} for "
+                f"{instance.instance_id!r}."
+            )
+
+        return plan
+
     @staticmethod
     def _validate_abstention(
         *,

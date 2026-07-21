@@ -1,3 +1,10 @@
+from genfine.evaluation.dual_verification import (
+    DualVerificationCategory,
+    DualVerificationError,
+    DualVerificationEvaluator,
+    DualVerificationRecord,
+    DualVerificationSummary,
+)
 from genfine.evaluation.evaluator import (
     EvaluationError,
     RunEvaluator,
@@ -13,6 +20,11 @@ from genfine.evaluation.run_loader import (
 
 
 __all__ = [
+    "DualVerificationCategory",
+    "DualVerificationError",
+    "DualVerificationEvaluator",
+    "DualVerificationRecord",
+    "DualVerificationSummary",
     "EvaluationError",
     "EvaluationSummary",
     "MetricValue",
