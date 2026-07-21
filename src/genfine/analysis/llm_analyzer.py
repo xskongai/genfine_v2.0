@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Protocol
+from typing import Any, Protocol
 
 from pydantic import ValidationError
 
@@ -11,6 +11,10 @@ from genfine.analysis.base import (
 )
 from genfine.analysis.prompt_builder import (
     AnalysisPromptBuilder,
+)
+from genfine.domain.enums import (
+    BiasMechanism,
+    FunctionLabel,
 )
 from genfine.domain.models import (
     AnalysisResult,
@@ -95,15 +99,10 @@ class LLMAnalyzer(Analyzer):
             payload=payload,
         )
 
-        try:
-            analysis = AnalysisResult.model_validate(
-                payload
-            )
-        except ValidationError as exc:
-            raise AnalyzerError(
-                "LLM returned an invalid AnalysisResult for "
-                f"{instance.instance_id!r}: {exc}"
-            ) from exc
+        analysis = self._validate_analysis_payload(
+            payload=payload,
+            instance_id=instance.instance_id,
+        )
 
         self._validate_span_offsets(
             instance=instance,
@@ -111,6 +110,148 @@ class LLMAnalyzer(Analyzer):
         )
 
         return analysis
+
+    @classmethod
+    def _validate_analysis_payload(
+        cls,
+        *,
+        payload: dict[str, Any],
+        instance_id: str,
+    ) -> AnalysisResult:
+        """
+        Validate once, apply two deterministic schema repairs on failure,
+        then validate exactly one more time.
+
+        The repair step never invents semantic labels or retries the model.
+        """
+
+        try:
+            return AnalysisResult.model_validate(payload)
+        except ValidationError as first_error:
+            repaired_payload = cls._repair_schema_payload(
+                payload=payload,
+            )
+
+            try:
+                return AnalysisResult.model_validate(
+                    repaired_payload
+                )
+            except ValidationError as second_error:
+                raise AnalyzerError(
+                    "LLM returned an invalid AnalysisResult for "
+                    f"{instance_id!r}. "
+                    f"Initial validation error: {first_error}. "
+                    f"Validation error after minimal repair: "
+                    f"{second_error}"
+                ) from second_error
+
+    @classmethod
+    def _repair_schema_payload(
+        cls,
+        *,
+        payload: dict[str, Any],
+    ) -> dict[str, Any]:
+        """
+        Apply only the two approved deterministic repairs.
+
+        The input payload is not mutated. A repaired deep copy is returned.
+        """
+
+        repaired = deepcopy(payload)
+        repaired.pop("confidence", None)
+
+        spans = repaired.get("spans")
+        if isinstance(spans, list):
+            movable_values = cls._movable_bias_mechanism_values()
+
+            for span in spans:
+                cls._repair_span_functions(
+                    span=span,
+                    movable_values=movable_values,
+                )
+
+        return repaired
+
+    @staticmethod
+    def _movable_bias_mechanism_values() -> set[str]:
+        bias_values = {
+            member.value
+            for member in BiasMechanism
+        }
+        function_values = {
+            member.value
+            for member in FunctionLabel
+        }
+
+        return bias_values - function_values
+
+    @classmethod
+    def _repair_span_functions(
+        cls,
+        *,
+        span: Any,
+        movable_values: set[str],
+    ) -> None:
+        if not isinstance(span, dict):
+            return
+
+        functions = span.get("functions")
+        bias = span.get("bias")
+
+        if (
+            not isinstance(functions, list)
+            or not isinstance(bias, dict)
+        ):
+            return
+
+        retained, moved = cls._partition_functions(
+            functions=functions,
+            movable_values=movable_values,
+        )
+
+        if not moved:
+            return
+
+        mechanisms = bias.get("mechanisms", [])
+        if not isinstance(mechanisms, list):
+            return
+
+        span["functions"] = retained
+        bias["mechanisms"] = cls._dedupe_preserving_order(
+            [*mechanisms, *moved]
+        )
+
+    @staticmethod
+    def _partition_functions(
+        *,
+        functions: list[Any],
+        movable_values: set[str],
+    ) -> tuple[list[Any], list[str]]:
+        retained: list[Any] = []
+        moved: list[str] = []
+
+        for value in functions:
+            if (
+                isinstance(value, str)
+                and value in movable_values
+            ):
+                moved.append(value)
+            else:
+                retained.append(value)
+
+        return retained, moved
+
+    @staticmethod
+    def _dedupe_preserving_order(
+        values: list[Any],
+    ) -> list[Any]:
+        unique: list[Any] = []
+
+        for value in values:
+            if value not in unique:
+                unique.append(value)
+
+        return unique
 
     @classmethod
     def _parse_json_output(
@@ -226,71 +367,96 @@ class LLMAnalyzer(Analyzer):
 
     @classmethod
     def _align_span_offsets(
-            cls,
-            *,
-            instance: DatasetInstance,
-            payload: dict,
-    ) -> dict:
+        cls,
+        *,
+        instance: DatasetInstance,
+        payload: dict[str, Any],
+    ) -> dict[str, Any]:
         """
         Recalculate span offsets deterministically from span.text.
 
-        LLM-provided offsets are treated only as hints. Python string
-        matching is the source of truth.
+        The input payload is not mutated. A deep-copied aligned payload
+        is returned.
         """
 
-        spans = payload.get("spans")
+        aligned = deepcopy(payload)
+        spans = aligned.get("spans")
 
-        if not isinstance(spans, list):
-            return payload
+        if isinstance(spans, list):
+            target_text = instance.context.target_text
 
-        target_text = instance.context.target_text
-
-        for index, span in enumerate(spans):
-            if not isinstance(span, dict):
-                continue
-
-            span_text = span.get("text")
-
-            if (
-                    not isinstance(span_text, str)
-                    or not span_text
-            ):
-                continue
-
-            positions = cls._find_all_occurrences(
-                target_text=target_text,
-                span_text=span_text,
-            )
-
-            if not positions:
-                raise AnalyzerError(
-                    f"Span {span.get('span_id', index)!r} "
-                    f"text {span_text!r} does not occur in "
-                    f"target_text for {instance.instance_id!r}"
+            for index, span in enumerate(spans):
+                cls._align_single_span(
+                    instance=instance,
+                    target_text=target_text,
+                    span=span,
+                    index=index,
                 )
 
-            provided_start = span.get("start")
+        return aligned
 
-            if len(positions) == 1:
-                resolved_start = positions[0]
+    @classmethod
+    def _align_single_span(
+        cls,
+        *,
+        instance: DatasetInstance,
+        target_text: str,
+        span: Any,
+        index: int,
+    ) -> None:
+        if not isinstance(span, dict):
+            return
 
-            elif (
-                    isinstance(provided_start, int)
-                    and provided_start in positions
-            ):
-                resolved_start = provided_start
+        span_text = span.get("text")
+        if not isinstance(span_text, str) or not span_text:
+            return
 
-            else:
-                raise AnalyzerError(
-                    f"Span {span.get('span_id', index)!r} "
-                    f"text {span_text!r} occurs multiple times "
-                    f"at {positions}, but no valid occurrence "
-                    "was identified"
-                )
+        positions = cls._find_all_occurrences(
+            target_text=target_text,
+            span_text=span_text,
+        )
 
-            span["start"] = resolved_start
-            span["end"] = (
-                    resolved_start + len(span_text)
+        if not positions:
+            raise AnalyzerError(
+                f"Span {span.get('span_id', index)!r} "
+                f"text {span_text!r} does not occur in "
+                f"target_text for {instance.instance_id!r}"
             )
 
-        return payload
+        resolved_start = cls._resolve_span_start(
+            instance=instance,
+            span=span,
+            span_text=span_text,
+            positions=positions,
+            index=index,
+        )
+
+        span["start"] = resolved_start
+        span["end"] = resolved_start + len(span_text)
+
+    @staticmethod
+    def _resolve_span_start(
+        *,
+        instance: DatasetInstance,
+        span: dict[str, Any],
+        span_text: str,
+        positions: list[int],
+        index: int,
+    ) -> int:
+        if len(positions) == 1:
+            return positions[0]
+
+        provided_start = span.get("start")
+        if (
+            isinstance(provided_start, int)
+            and provided_start in positions
+        ):
+            return provided_start
+
+        raise AnalyzerError(
+            f"Span {span.get('span_id', index)!r} "
+            f"text {span_text!r} occurs multiple times "
+            f"at {positions}, but no valid occurrence "
+            f"was identified for {instance.instance_id!r}"
+        )
+
