@@ -1,0 +1,43 @@
+{
+  "dataset_instances": 15,
+  "successful_instances": 13,
+  "pipeline_coverage": {
+    "correct": 13,
+    "total": 15,
+    "accuracy": 0.8666666666666667
+  },
+  "analysis_failures": 2,
+  "analysis_failure_rate": 0.13333333333333333,
+  "decision_or_plan_failures": 0,
+  "span_action": {
+    "correct": 16,
+    "total": 21,
+    "accuracy": 0.7619047619047619
+  },
+  "matched_span_action": {
+    "correct": 16,
+    "total": 19,
+    "accuracy": 0.8421052631578947
+  },
+  "instance_action": {
+    "correct": 11,
+    "total": 15,
+    "accuracy": 0.7333333333333333
+  },
+  "edit_scope": {
+    "correct": 9,
+    "total": 15,
+    "accuracy": 0.6
+  },
+  "plan_exact_match": {
+    "correct": 6,
+    "total": 15,
+    "accuracy": 0.4
+  },
+  "unmatched_gold_spans": 2,
+  "extra_predicted_decisions": 5,
+  "failed_instance_ids": [
+    "zh_seed_0006",
+    "zh_seed_0015"
+  ]
+}

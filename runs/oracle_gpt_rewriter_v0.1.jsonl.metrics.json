@@ -1,0 +1,82 @@
+{
+  "dataset_instance_count": 5,
+  "evaluated_instance_count": 3,
+  "successful_instances": 3,
+  "failed_instances": 0,
+  "analysis_exact_match": {
+    "numerator": 3,
+    "denominator": 3,
+    "value": 1.0
+  },
+  "span_action_accuracy": {
+    "numerator": 5,
+    "denominator": 5,
+    "value": 1.0
+  },
+  "instance_action_accuracy": {
+    "numerator": 3,
+    "denominator": 3,
+    "value": 1.0
+  },
+  "edit_scope_accuracy": {
+    "numerator": 3,
+    "denominator": 3,
+    "value": 1.0
+  },
+  "output_exact_match": {
+    "numerator": 2,
+    "denominator": 3,
+    "value": 0.6666666666666666
+  },
+  "verification_coverage": {
+    "numerator": 3,
+    "denominator": 3,
+    "value": 1.0
+  },
+  "verification_pass_rate": {
+    "numerator": 3,
+    "denominator": 3,
+    "value": 1.0
+  },
+  "protected_fact_preservation_rate": {
+    "numerator": 3,
+    "denominator": 3,
+    "value": 1.0
+  },
+  "action_compliance_rate": {
+    "numerator": 3,
+    "denominator": 3,
+    "value": 1.0
+  },
+  "unsupported_gender_insertion_rate": {
+    "numerator": 0,
+    "denominator": 3,
+    "value": 0.0
+  },
+  "over_neutralization_rate": {
+    "numerator": 0,
+    "denominator": 2,
+    "value": 0.0
+  },
+  "under_correction_rate": {
+    "numerator": 0,
+    "denominator": 1,
+    "value": 0.0
+  },
+  "metadata": {
+    "analyzers": [
+      "oracle"
+    ],
+    "rewriters": [
+      "openai/gpt-4o"
+    ],
+    "decision_rule_versions": [
+      "0.1"
+    ],
+    "missing_run_record_count": 2,
+    "missing_run_record_ids": [
+      "zh_seed_0004",
+      "zh_seed_0005"
+    ]
+  }
+}

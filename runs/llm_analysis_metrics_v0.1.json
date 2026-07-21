@@ -1,0 +1,83 @@
+{
+  "dataset_instances": 15,
+  "prediction_records": 15,
+  "missing_predictions": 0,
+  "extra_predictions": 0,
+  "schema_validity": {
+    "correct": 13,
+    "total": 15,
+    "accuracy": 0.8666666666666667
+  },
+  "analysis_exact_match": {
+    "correct": 0,
+    "total": 15,
+    "accuracy": 0.0
+  },
+  "exact_span": {
+    "true_positive": 13,
+    "false_positive": 11,
+    "false_negative": 8,
+    "precision": 0.5416666666666666,
+    "recall": 0.6190476190476191,
+    "f1": 0.5777777777777778
+  },
+  "overlap_span": {
+    "true_positive": 19,
+    "false_positive": 5,
+    "false_negative": 2,
+    "precision": 0.7916666666666666,
+    "recall": 0.9047619047619048,
+    "f1": 0.8444444444444444
+  },
+  "matched_span_coverage": {
+    "correct": 19,
+    "total": 21,
+    "accuracy": 0.9047619047619048
+  },
+  "function_labels": {
+    "true_positive": 19,
+    "false_positive": 9,
+    "false_negative": 15,
+    "precision": 0.6785714285714286,
+    "recall": 0.5588235294117647,
+    "f1": 0.6129032258064516
+  },
+  "necessity_status": {
+    "correct": 6,
+    "total": 19,
+    "accuracy": 0.3157894736842105
+  },
+  "bias_status": {
+    "correct": 16,
+    "total": 19,
+    "accuracy": 0.8421052631578947
+  },
+  "bias_mechanisms": {
+    "true_positive": 9,
+    "false_positive": 6,
+    "false_negative": 4,
+    "precision": 0.6,
+    "recall": 0.6923076923076923,
+    "f1": 0.6428571428571429
+  },
+  "span_stance": {
+    "correct": 10,
+    "total": 19,
+    "accuracy": 0.5263157894736842
+  },
+  "speaker_stance": {
+    "correct": 8,
+    "total": 15,
+    "accuracy": 0.5333333333333333
+  },
+  "context_sufficient": {
+    "correct": 12,
+    "total": 15,
+    "accuracy": 0.8
+  },
+  "invalid_instance_ids": [
+    "zh_seed_0006",
+    "zh_seed_0015"
+  ],
+  "extra_instance_ids": []
+}

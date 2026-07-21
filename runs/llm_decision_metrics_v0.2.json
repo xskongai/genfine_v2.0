@@ -1,0 +1,40 @@
+{
+  "dataset_instances": 15,
+  "successful_instances": 15,
+  "pipeline_coverage": {
+    "correct": 15,
+    "total": 15,
+    "accuracy": 1.0
+  },
+  "analysis_failures": 0,
+  "analysis_failure_rate": 0.0,
+  "decision_or_plan_failures": 0,
+  "span_action": {
+    "correct": 17,
+    "total": 21,
+    "accuracy": 0.8095238095238095
+  },
+  "matched_span_action": {
+    "correct": 17,
+    "total": 20,
+    "accuracy": 0.85
+  },
+  "instance_action": {
+    "correct": 12,
+    "total": 15,
+    "accuracy": 0.8
+  },
+  "edit_scope": {
+    "correct": 12,
+    "total": 15,
+    "accuracy": 0.8
+  },
+  "plan_exact_match": {
+    "correct": 10,
+    "total": 15,
+    "accuracy": 0.6666666666666666
+  },
+  "unmatched_gold_spans": 1,
+  "extra_predicted_decisions": 2,
+  "failed_instance_ids": []
+}
